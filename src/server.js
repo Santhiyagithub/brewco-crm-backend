@@ -30,9 +30,10 @@ const startup = async () => {
     // Mount the CRM endpoints
     crmApp.use('/api', crmRouter);
 
-    crmApp.listen(5000, () => {
+    const crmPort = process.env.PORT || 5000;
+    crmApp.listen(crmPort, () => {
       console.log('===================================================');
-      console.log('  CRM Backend Service running at http://localhost:5000');
+      console.log(`  CRM Backend Service running at port: ${crmPort}`);
       console.log('===================================================');
     });
 
