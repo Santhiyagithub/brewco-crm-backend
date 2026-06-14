@@ -5,6 +5,12 @@ import { processNaturalLanguageGoal } from './ai.js';
 
 const router = express.Router();
 
+// Health check endpoint for cloud platform routing
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+
 /**
  * --- CRM ROUTER LAYER ---
  * This file serves as the main business logic layer of the CRM.
