@@ -1,0 +1,131 @@
+{
+  "name": "BrewCo CRM Campaign Dispatcher",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "campaign-dispatch",
+        "options": {}
+      },
+      "id": "1d102e3b-93bf-4375-9c98-b80df96191ef",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "2d102e3b-93bf-4375-9c98-b80df96192ff",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5001/channel/send",
+        "sendBody": true,
+        "contentType": "json",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient",
+              "value": "={{$node[\"Split In Batches\"].currentRunInput.item.phone || $node[\"Split In Batches\"].currentRunInput.item.email}}"
+            },
+            {
+              "name": "message",
+              "value": "=Hey {{$node[\"Split In Batches\"].currentRunInput.item.name}}, enjoy your BrewCo specialty roast!"
+            },
+            {
+              "name": "channel",
+              "value": "WhatsApp"
+            },
+            {
+              "name": "deliveryId",
+              "value": "={{Math.floor(Math.random()*100000)}}"
+            },
+            {
+              "name": "campaignId",
+              "value": "1"
+            },
+            {
+              "name": "customerId",
+              "value": "={{$node[\"Split In Batches\"].currentRunInput.item.id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d102e3b-93bf-4375-9c98-b80df96193aa",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4d102e3b-93bf-4375-9c98-b80df96194bb",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

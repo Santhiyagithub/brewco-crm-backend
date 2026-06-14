@@ -1,0 +1,154 @@
+{
+  "info": {
+    "name": "BrewCo CRM API Suite",
+    "description": "Postman Collection for testing and validating the BrewCo CRM Backend (Port 5000) and Mock Channel Service Simulator (Port 5001).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CRM Backend (Port 5000)",
+      "item": [
+        {
+          "name": "Get Shoppers (All or Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/customers?sqlFilter=total_spent > 5000",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "customers"],
+              "query": [
+                {
+                  "key": "sqlFilter",
+                  "value": "total_spent > 5000",
+                  "description": "Optional SQLite WHERE clause filter"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Campaign History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/campaigns",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "campaigns"]
+            }
+          }
+        },
+        {
+          "name": "AI Agent Goal Planner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"Re-engage inactive coffee shoppers who haven't visited in 30 days with a WhatsApp promo\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/ai/agent",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "ai", "agent"]
+            }
+          }
+        },
+        {
+          "name": "Launch Campaign (Enqueue Jobs)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gold Cup Promo\",\n  \"channel\": \"WhatsApp\",\n  \"messageTemplate\": \"Hey {{name}}, claim your free espresso! Code: GOLD20\",\n  \"sqlFilter\": \"order_count > 5\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/campaigns",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "campaigns"]
+            }
+          }
+        },
+        {
+          "name": "Inspect Active Queue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/queue/jobs",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "queue", "jobs"]
+            }
+          }
+        },
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/dashboard/stats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Channel Service Gateway (Port 5001)",
+      "item": [
+        {
+          "name": "Dispatch to Channel Simulator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryId\": 9999,\n  \"campaignId\": 1,\n  \"customerId\": 2,\n  \"recipient\": \"+919876500000\",\n  \"message\": \"Hey Jane, enjoy a discount!\",\n  \"channel\": \"WhatsApp\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/channel/send",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["channel", "send"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
