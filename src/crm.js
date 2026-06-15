@@ -5,6 +5,11 @@ import { processNaturalLanguageGoal } from './ai.js';
 
 const router = express.Router();
 
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+
 /**
  * --- WHAT THIS ROUTER DOES
  * This file serves as the main business logic layer of the CRM.
