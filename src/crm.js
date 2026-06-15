@@ -5,14 +5,8 @@ import { processNaturalLanguageGoal } from './ai.js';
 
 const router = express.Router();
 
-// Health check endpoint for cloud platform routing
-router.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
-});
-
-
 /**
- * --- CRM ROUTER LAYER ---
+ * --- WHAT THIS ROUTER DOES
  * This file serves as the main business logic layer of the CRM.
  * It houses endpoints for reading customer and campaign records, triggering bulk dispatches,
  * delegating prompts to the AI engine, and receiving the async callbacks from the Mock Channel Service.
@@ -26,13 +20,13 @@ router.get('/customers', async (req, res) => {
   try {
     const { sqlFilter } = req.query;
 
-    // --- SECURITY & SQL INJECTION CONSIDERATIONS ---
-    // Security Note: Evaluating raw client-submitted queries directly in SQL (like we do below with sqlFilter)
+    // --- SECURITY WARNING  ---
+    // Security Note: Evaluating raw user-submitted queries directly in SQL (like we do below with sqlFilter)
     // creates a SQL injection vulnerability. 
-    // Architecture choice: For the scope of this project, passing the AI-generated SQL query directly 
-    // allows flexible dynamic segmentation. In an enterprise system, we would use a structured schema
-    // (e.g. JSON rules) validated by a parser or translated using parameterized bindings in Knex/Sequelize.
-    
+    // "For the scope of this assignment, passing the AI-generated SQL query directly 
+    // allows flexible dynamic segmentation. In an enterprise system, I would use a structured schema
+    // (e.g. JSON rules) validated by a validator or translated using parameterized bindings in Knex/Sequelize."
+
     let query = 'SELECT * FROM customers';
     const params = [];
 
@@ -158,26 +152,6 @@ router.post('/campaigns', async (req, res) => {
       });
     }
 
-    // 4. Trigger n8n workflow in the background (non-blocking webhook)
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook/campaign-dispatch';
-    fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        customers,
-        campaign: {
-          id: campaignId,
-          name,
-          channel,
-          message_template: messageTemplate
-        }
-      })
-    }).catch((err) => {
-      console.log(`[n8n Integration] n8n webhook offline or skipped. Error: ${err.message}`);
-    });
-
     res.json({
       success: true,
       campaignId,
@@ -269,7 +243,7 @@ router.get('/dashboard/stats', async (req, res) => {
     const totalCustomersRes = await getQuery('SELECT COUNT(*) as count FROM customers');
     const totalRevenueRes = await getQuery('SELECT SUM(revenue_generated) as rev FROM campaigns');
     const totalCampaignsRes = await getQuery('SELECT COUNT(*) as count FROM campaigns');
-    
+
     // Delivery logs
     const recentDeliveries = await allQuery(`
       SELECT d.id, d.recipient_address, d.status, d.last_updated, c.name as campaign_name, cust.name as customer_name
