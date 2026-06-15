@@ -30,6 +30,12 @@ const startup = async () => {
     // Mount the CRM endpoints
     crmApp.use('/api', crmRouter);
 
+    // Default welcome route for browser inspections
+    crmApp.get('/', (req, res) => {
+      res.send('Welcome to BrewCo CRM API service. Active endpoints are under /api.');
+    });
+
+
     const crmPort = process.env.PORT || 5000;
     crmApp.listen(crmPort, () => {
       console.log('===================================================');
