@@ -118,7 +118,7 @@ const sendCallback = async (deliveryId, campaignId, customerId, status, purchase
     console.log(`[Channel Service Callback] Dispatching status: '${status}' for delivery ID: ${deliveryId}`);
 
     // Read the CRM URL dynamically from environment variables for flexible hosting
-    const CRM_URL = process.env.CRM_URL || 'http://localhost:5000';
+    const CRM_URL = process.env.CRM_URL || `http://localhost:${process.env.PORT || 5000}`;
     const response = await fetch(`${CRM_URL}/api/callback/receipt`, {
       method: 'POST',
       headers: {
